@@ -2,14 +2,18 @@ const app = new PIXI.Application({
     width: window.innerWidth,
     height: window.innerHeight,
     view: document.getElementById("canvas"),
-    // backgroundColor: 0x000000, // Задайте бажаний колір фону
     backgroundColor: "transparent", // Задайте бажаний колір фону
   });
+
   // Створення текстури для шейдера (замість iChannel0)
   const texture = PIXI.Texture.from("https://source.unsplash.com/random/500x500"); // Замініть шлях на свій
   texture.baseTexture.wrapMode = PIXI.WRAP_MODES.REPEAT;
   // Створення спрайта з текстурою
   const sprite = new PIXI.Sprite(texture);
+  const canvas = document.getElementById("canvas")
+
+  sprite.width = canvas.width;
+  sprite.height = canvas.height;
   app.stage.addChild(sprite);
   // Створення shader
   const shaderCode = `
@@ -52,6 +56,7 @@ const app = new PIXI.Application({
     gl_FragColor = vec4( red, green,blue, 1.0 );
   }
   `;
+
   // Set dimensions
   function initDimensions() {
     width = window.innerWidth;
@@ -62,7 +67,8 @@ const app = new PIXI.Application({
   let pointerDownTarget = 0;
   let pointerStart = new PIXI.Point();
   let pointerDiffStart = new PIXI.Point();
-  let diffY, diffX, widthRest, heightRest;
+  let diffY, diffX, widthRest, heightRest, container;
+
   const uniforms = {
     uResolution: new PIXI.Point(app.screen.width, app.screen.height),
     uPointerDiff: new PIXI.Point(),
@@ -70,7 +76,7 @@ const app = new PIXI.Application({
   };
   const shader = new PIXI.Filter(null, shaderCode, uniforms);
   app.stage.filters = [shader];
-  // sprite.filters = [shader];
+
   // Додавання обробників подій для ефекту hover
   sprite.interactive = true;
   const onPointerOver = () => {
@@ -133,6 +139,7 @@ const app = new PIXI.Application({
     uniforms.uPointerDiff.x += (diffX - uniforms.uPointerDiff.x) * 0.2;
     uniforms.uPointerDiff.y += (diffY - uniforms.uPointerDiff.y) * 0.2;
   });
+
   // Clean the current Application
   function clean() {
     // Stop the current animation
@@ -144,3 +151,4 @@ const app = new PIXI.Application({
       .off("pointerupoutside", onPointerUp)
       .off("pointermove", onPointerMove);
   } 
+  
